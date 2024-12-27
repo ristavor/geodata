@@ -18,14 +18,14 @@ jobs:
           echo "RELEASE_NAME=Released on $(date +%Y%m%d%H%M)" >> $GITHUB_ENV
           echo "TAG_NAME=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
           
-          echo "GEOIP_URL=https://raw.githubusercontent.com/runetfreedom/russia-blocked-geoip/release/geoip.dat" >> $GITHUB_ENV
-          echo "GEOSITE_URL=https://raw.githubusercontent.com/runetfreedom/russia-blocked-geosite/release/geosite.dat" >> $GITHUB_ENV
+          echo "GEOIP_URL=https://raw.githubusercontent.com/ristavor/russia-blocked-geoip/release/geoip.dat" >> $GITHUB_ENV
+          echo "GEOSITE_URL=https://raw.githubusercontent.com/ristavor/russia-blocked-geosite/release/geosite.dat" >> $GITHUB_ENV
         shell: bash
 
-      - name: Checkout runetfreedom/geodat2srs
+      - name: Checkout ristavor/geodat2srs
         uses: actions/checkout@v4
         with:
-          repository: runetfreedom/geodat2srs
+          repository: ristavor/geodat2srs
           path: geodat2srs
 
       - name: Set up Go
