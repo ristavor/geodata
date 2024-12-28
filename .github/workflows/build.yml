@@ -16,8 +16,8 @@ jobs:
     steps:
       - name: Set variables
         run: |
-          echo "RELEASE_NAME=release" >> $GITHUB_ENV
-          echo "TAG_NAME=release" >> $GITHUB_ENV
+          echo "RELEASE_NAME=geodata" >> $GITHUB_ENV
+          echo "TAG_NAME=geodata" >> $GITHUB_ENV
           
           echo "GEOIP_URL=https://raw.githubusercontent.com/ristavor/geoip/release/geoip.dat" >> $GITHUB_ENV
           echo "GEOSITE_URL=https://raw.githubusercontent.com/ristavor/geosite/release/geosite.dat" >> $GITHUB_ENV
