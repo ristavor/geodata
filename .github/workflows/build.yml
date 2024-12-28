@@ -38,8 +38,8 @@ jobs:
         run: |
           mkdir -p ./publish
           # Скачиваем только необходимые файлы без .sha256sum
-          curl -sSL $GEOIP_URL > ./publish/geoip.dat
-          curl -sSL $GEOSITE_URL > ./publish/geosite.dat
+          curl -sSL $GEOIP_URL -o ./publish/geoip.dat
+          curl -sSL $GEOSITE_URL -o ./publish/geosite.dat
         shell: bash
 
       - name: Generate sing-box srs
@@ -51,9 +51,11 @@ jobs:
           zip -r ../../publish/sing-box.zip *
         shell: bash
 
-      - name: Remove sing-box.zip before uploading
+      # Удаление sing-box.zip перед загрузкой убрано, чтобы файл мог быть загружен в релиз
+
+      - name: Remove .sha256sum files if any
         run: |
-          rm -f ./publish/sing-box.zip
+          find ./publish -type f -name "*.sha256sum" -delete
         shell: bash
 
       - name: Upload files to GitHub Release
@@ -67,7 +69,3 @@ jobs:
             ./publish/sing-box.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Шаг "Git push assets to 'release' branch" удалён, так как управление ассетами осуществляется через GitHub Releases
-
-      # Шаг "Purge jsdelivr CDN" удалён, так как он не требуется при использовании GitHub Releases
