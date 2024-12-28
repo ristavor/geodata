@@ -1,8 +1,8 @@
-name: build.yml
+name: Build and Publish GeoData
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 3,9,15,21 * * *"
+    - cron: "30 3,15 * * *"  # Запуск в 3:30 и 15:30 UTC ежедневно
   push:
     branches:
       - master
@@ -11,21 +11,22 @@ on:
 
 jobs:
   build:
+    name: Build and Publish
     runs-on: ubuntu-latest
     steps:
       - name: Set variables
         run: |
-          echo "RELEASE_NAME=Released on $(date +%Y%m%d%H%M)" >> $GITHUB_ENV
-          echo "TAG_NAME=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=release" >> $GITHUB_ENV
+          echo "TAG_NAME=release" >> $GITHUB_ENV
           
-          echo "GEOIP_URL=https://raw.githubusercontent.com/ristavor/russia-blocked-geoip/release/geoip.dat" >> $GITHUB_ENV
-          echo "GEOSITE_URL=https://raw.githubusercontent.com/ristavor/russia-blocked-geosite/release/geosite.dat" >> $GITHUB_ENV
+          echo "GEOIP_URL=https://raw.githubusercontent.com/ristavor/geoip/release/geoip.dat" >> $GITHUB_ENV
+          echo "GEOSITE_URL=https://raw.githubusercontent.com/ristavor/geosite/release/geosite.dat" >> $GITHUB_ENV
         shell: bash
 
-      - name: Checkout ristavor/geodat2srs
+      - name: Checkout runetfreedom/geodat2srs
         uses: actions/checkout@v4
         with:
-          repository: ristavor/geodat2srs
+          repository: runetfreedom/geodat2srs
           path: geodat2srs
 
       - name: Set up Go
@@ -36,11 +37,10 @@ jobs:
       - name: Collect files
         run: |
           mkdir -p ./publish
+          # Скачиваем только необходимые файлы без .sha256sum
           curl -sSL $GEOIP_URL > ./publish/geoip.dat
-          curl -sSL $GEOIP_URL.sha256sum > ./publish/geoip.dat.sha256sum
-          
           curl -sSL $GEOSITE_URL > ./publish/geosite.dat
-          curl -sSL $GEOSITE_URL.sha256sum > ./publish/geosite.dat.sha256sum
+        shell: bash
 
       - name: Generate sing-box srs
         run: |
@@ -49,26 +49,25 @@ jobs:
           ./geodat2srs/geodat2srs geosite -i ./publish/geosite.dat -o ./tmp/sing-box/rule-set-geosite/
           cd ./tmp/sing-box || exit 1
           zip -r ../../publish/sing-box.zip *
+        shell: bash
 
-      - name: Release and upload assets
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          release_name: ${{ env.RELEASE_NAME }}
-          tag: ${{ env.TAG_NAME }}
-          file_glob: true
-          file: ./publish/*
-
-      - name: Git push assets to "release" branch
+      - name: Remove sing-box.zip before uploading
         run: |
-          rm -rf ./publish/sing-box.zip
-          mv ./tmp/sing-box ./publish/sing-box
-          cd publish || exit 1
-          git init
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b release
-          git add .
-          git commit -m "${{ env.RELEASE_NAME }}"
-          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
-          git push -f -u origin release
+          rm -f ./publish/sing-box.zip
+        shell: bash
+
+      - name: Upload files to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: ${{ env.RELEASE_NAME }}
+          files: |
+            ./publish/geoip.dat
+            ./publish/geosite.dat
+            ./publish/sing-box.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Шаг "Git push assets to 'release' branch" удалён, так как управление ассетами осуществляется через GitHub Releases
+
+      # Шаг "Purge jsdelivr CDN" удалён, так как он не требуется при использовании GitHub Releases
