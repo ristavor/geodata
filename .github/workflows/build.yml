@@ -19,8 +19,8 @@ jobs:
           echo "RELEASE_NAME=geodata" >> $GITHUB_ENV
           echo "TAG_NAME=geodata" >> $GITHUB_ENV
           
-          echo "GEOIP_URL=https://github.com/ristavor/geoip/releases/download/geosite/geoip.dat" >> $GITHUB_ENV
-          echo "GEOSITE_URL=https://github.com/ristavor/geosite/releases/download/geosite/geosite.dat" >> $GITHUB_ENV
+          echo "GEOIP_URL=https://github.com/ristavor/geoip/releases/latest/download/geoip.dat" >> $GITHUB_ENV
+          echo "GEOSITE_URL=https://github.com/ristavor/geosite/releases/latest/download/geosite.dat" >> $GITHUB_ENV
         shell: bash
 
       - name: Checkout runetfreedom/geodat2srs
