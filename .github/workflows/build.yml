@@ -2,7 +2,7 @@ name: Build and Publish GeoData
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 3,15 * * *"  # Запуск в 3:30 и 15:30 UTC ежедневно
+    - cron: "30 22 * * *" 
   push:
     branches:
       - master
