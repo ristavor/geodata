@@ -33,6 +33,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: ./geodat2srs/go.mod
+          cache-dependency-path: ./geodat2srs/go.sum
 
       - name: Collect files
         run: |
